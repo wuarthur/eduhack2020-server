@@ -24,9 +24,9 @@ def exception_handler(func):
         except MissingHeaders:
             traceback.print_exc()
             return jsonify({'Error': 'Missing required header(s) for this request or one of the provided headers contains invalid parameters'}, 404)
-        except InvalidWaferType:
+        except MissingBody:
             traceback.print_exc()
-            return jsonify({'Error': "type has to be one of 'total', 'broken', 'crack-detected', 'others'"}, 404)
+            return jsonify({'Error': "missing body data"}, 404)
         except Exception as e:
             traceback.print_exc()
             return jsonify({'Error': traceback.format_exc().replace('"', "'")}, 404)
