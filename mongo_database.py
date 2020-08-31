@@ -17,14 +17,14 @@ STUDENT_TEMPLATE={
     #required fields, todo maybe support arbitary fields in code
     'student-id': None,
     'name': None,
-    'classes': [], #list of id
+    'courses': [], #list of id
 }
 
 TEACHER_TEMPLATE={
     #required fields, todo maybe support arbitary fields in code
     'teacher-id': None,
     'name': None,
-    'classes': [], #list of id
+    'courses': [], #list of id
 }
 
 
@@ -38,10 +38,26 @@ CLASS_TEMPLATE={
     'number-of-lectures':None,
 }
 
-def add_student(id, name, classes, **kwargs):
+def get_teachers(**kwargs):
+    collection = db['Teachers']
+    query = []
+    for key, val in kwargs.items():
+        query.append({key:val})
+
+    teachers=[]
+    print({"$and": query})
+    for post in collection.find({"$and": query}):
+        del post['_id']
+        teachers.append(post)
+    # for posts in collection.find({'height': '190cm'}):
+    #     teachers.append(posts)
+
+    return teachers
+
+def add_student(id, name, courses, **kwargs):
     doc={'student-id': id,
          'name': name,
-         'classes': classes}
+         'courses': courses}
     for key, val in kwargs.items():
         if key not in doc: #avoid overriding required fields
             doc[key] = val
@@ -74,8 +90,17 @@ def update_class_batch():
     #todo: allow client side to send a array of student ids for one class.
     pass
 
-def add_teacher():
-    pass
+def add_teacher(id, name, courses, **kwargs):
+    doc = { 'teacher-id': id,
+            'name': name,
+            'courses': courses, #list of id
+         }
+    for key, val in kwargs.items():
+        if key not in doc:  # avoid overriding required fields
+            doc[key] = val
+    collection_name = 'Teachers'
+    db[collection_name].insert_one(doc)
+    db[collection_name].create_index('name')  # sort by name
 
 def update_teacher():
     pass
