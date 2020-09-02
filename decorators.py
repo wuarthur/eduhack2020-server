@@ -27,6 +27,9 @@ def exception_handler(func):
         except MissingBody:
             traceback.print_exc()
             return jsonify({'Error': "missing required body data"}, 404)
+        except ItemNotFoundException:
+            traceback.print_exc()
+            return jsonify({'Error': "the document with the search id does not exist in the databse, please create first"}, 404)
         except Exception as e:
             traceback.print_exc()
             return jsonify({'Error': traceback.format_exc().replace('"', "'")}, 404)

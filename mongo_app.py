@@ -52,6 +52,22 @@ def get_teacher():
 
     return jsonify(response, 200)
 
+@app.route('/class', methods=['POST'])
+@exception_handler
+def create_class():
+    try:
+        request_body = request.form.to_dict()
+        id = request_body.pop('class-id')
+        name = request_body.pop('course-name')
+        courses = request_body.pop('year-offered')
+        students = request_body.pop('students')
+        number_lecture = request_body.pop('number-of-lectures')
+        mongo_database.add_class(id, name, courses, students, number_lecture, **request_body)
+    except ValueError:
+        raise MissingBody
+    except KeyError:
+        raise MissingBody
+    return jsonify({"success": True, "status": 200}, 200)
 if __name__ == '__main__':
      app.run(host='127.0.0.1',port='1911', debug=True)
      # http_server = WSGIServer(('0.0.0.0', 1911), app)

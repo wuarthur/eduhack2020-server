@@ -3,6 +3,7 @@ import pymongo
 from pprint import pprint
 from datetime import datetime, timedelta
 from decorators import timer
+from exceptions import *
 
 print('starting db')
 mongo_client = MongoClient('mongodb://localhost:27017/',
@@ -13,30 +14,15 @@ mongo_client = MongoClient('mongodb://localhost:27017/',
 db = mongo_client['test']
 print('connection to Mongodb made')
 
-STUDENT_TEMPLATE={
-    #required fields, todo maybe support arbitary fields in code
-    'student-id': None,
-    'name': None,
-    'courses': [], #list of id
-}
-
-TEACHER_TEMPLATE={
-    #required fields, todo maybe support arbitary fields in code
-    'teacher-id': None,
-    'name': None,
-    'courses': [], #list of id
-}
-
-
-CLASS_TEMPLATE={
-    #required fields, todo maybe support arbitary fields in code
-    'class-id': None,
-    'course-name': None,
-    'year-offered': None,
-    'students': [], #list of student-id
-    'student-id':[], #attendence for this student, will have meny of this per class
-    'number-of-lectures':None,
-}
+def update(collection, id_str, **kwargs):
+    collection = db[collection]
+    document = collection.find_one({id_str: id})
+    if document is None:
+        raise ItemNotFoundException
+    else:
+        for key, val in kwargs.items():
+            document[key]=val
+        collection.update_one({id_str: id}, {"$set": document}, upsert=False)
 
 def get_teachers(**kwargs):
     collection = db['Teachers']
@@ -61,14 +47,13 @@ def add_student(id, name, courses, **kwargs):
     for key, val in kwargs.items():
         if key not in doc: #avoid overriding required fields
             doc[key] = val
-    collection_name = 'Student'
+    collection_name = 'Students'
     db[collection_name].insert_one(doc)
     db[collection_name].create_index('name') #sort by name
 
-def update_student():
-    pass
 
 def add_class(id, name, year, students, lectures_count, **kwargs):
+    #todo check for duplicate
     doc = {'class-id': id,
             'course-name': name,
             'year-offered': year,
@@ -82,14 +67,6 @@ def add_class(id, name, year, students, lectures_count, **kwargs):
     db[collection_name].create_index('course-name')  # sort by name
     db[collection_name].create_index('year-offered')  # sort by name
 
-def update_class():
-    #called most often, each time a student signs in need one update
-    pass
-
-def update_class_batch():
-    #todo: allow client side to send a array of student ids for one class.
-    pass
-
 def add_teacher(id, name, courses, **kwargs):
     doc = { 'teacher-id': id,
             'name': name,
@@ -102,5 +79,11 @@ def add_teacher(id, name, courses, **kwargs):
     db[collection_name].insert_one(doc)
     db[collection_name].create_index('name')  # sort by name
 
-def update_teacher():
-    pass
+def update_teacher(id, **kwargs):
+    update('Teachers', 'teacher-id', **kwargs)
+
+def update_student(id, **kwargs):
+    update('Students', 'student-id', **kwargs)
+
+def update_class(id, **kwargs):
+    update('Courses', 'class-id', **kwargs)
