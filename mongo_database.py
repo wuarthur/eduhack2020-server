@@ -23,6 +23,7 @@ def update(collection, id_str, **kwargs):
         for key, val in kwargs.items():
             document[key]=val
         collection.update_one({id_str: id}, {"$set": document}, upsert=False)
+    return document
 
 def get_teachers(**kwargs):
     collection = db['Teachers']
@@ -37,8 +38,22 @@ def get_teachers(**kwargs):
         teachers.append(post)
     # for posts in collection.find({'height': '190cm'}):
     #     teachers.append(posts)
-
     return teachers
+
+def get_student(**kwargs):
+    collection = db['Students']
+    query = []
+    for key, val in kwargs.items():
+        query.append({key:val})
+
+    students=[]
+    print({"$and": query})
+    for post in collection.find({"$and": query}):
+        del post['_id']
+        students.append(post)
+    # for posts in collection.find({'height': '190cm'}):
+    #     teachers.append(posts)
+    return students
 
 def add_student(id, name, courses, **kwargs):
     doc={'student-id': id,
@@ -80,10 +95,10 @@ def add_teacher(id, name, courses, **kwargs):
     db[collection_name].create_index('name')  # sort by name
 
 def update_teacher(id, **kwargs):
-    update('Teachers', 'teacher-id', **kwargs)
+    return update('Teachers', 'teacher-id', **kwargs)
 
 def update_student(id, **kwargs):
-    update('Students', 'student-id', **kwargs)
+    return update('Students', 'student-id', **kwargs)
 
 def update_class(id, **kwargs):
-    update('Courses', 'class-id', **kwargs)
+    return update('Courses', 'class-id', **kwargs)

@@ -27,6 +27,21 @@ def index():
             '/class POST \n')
 
 
+@app.route('/student', methods=['POST'])
+@exception_handler
+def add_student():
+    try:
+        request_body = request.form.to_dict()
+        id = request_body.pop('student-id')
+        name = request_body.pop('name')
+        courses = request_body.pop('courses')
+        mongo_database.add_student(id, name, courses, **request_body)
+    except ValueError:
+        raise MissingBody
+    except KeyError:
+        raise MissingBody
+    return jsonify({"success": True, "status": 200}, 200)
+
 @app.route('/teacher', methods=['POST'])
 @exception_handler
 def add_teacher():
@@ -44,12 +59,11 @@ def add_teacher():
 
 @app.route('/teacher', methods=['GET'])
 @exception_handler
-def get_teacher():
+def search_teacher():
     request_body = request.form.to_dict()
     teachers = mongo_database.get_teachers(**request_body)
     response = {'results': teachers}
     print(response)
-
     return jsonify(response, 200)
 
 @app.route('/class', methods=['POST'])
@@ -68,6 +82,29 @@ def create_class():
     except KeyError:
         raise MissingBody
     return jsonify({"success": True, "status": 200}, 200)
+
+@app.route('/class/<id>', methods=['POST'])
+@exception_handler
+def update_class(id):
+    request_body = request.form.to_dict()
+    updated_doc = mongo_database.update_class(id, **request_body)
+    return jsonify({"success": True, "updated_doc": updated_doc}, 200)
+
+@app.route('/student/<id>', methods=['POST'])
+@exception_handler
+def update_student(id):
+    request_body = request.form.to_dict()
+    updated_doc = mongo_database.update_class(id, **request_body)
+    return jsonify({"success": True, "updated_doc": updated_doc}, 200)
+
+@app.route('/teacher/<id>', methods=['POST'])
+@exception_handler
+def update_teacher(id):
+    request_body = request.form.to_dict()
+    updated_doc = mongo_database.update_class(id, **request_body)
+    return jsonify({"success": True, "updated_doc": updated_doc}, 200)
+
+
 if __name__ == '__main__':
      app.run(host='127.0.0.1',port='1911', debug=True)
      # http_server = WSGIServer(('0.0.0.0', 1911), app)
