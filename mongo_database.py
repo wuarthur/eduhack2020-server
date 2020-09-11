@@ -102,3 +102,19 @@ def update_student(id, **kwargs):
 
 def update_class(id, **kwargs):
     return update('Courses', 'class-id', **kwargs)
+
+def take_attendence(class_id, student_id, attended):
+    #attended = 0,1
+    collection = db['Courses']
+    document = collection.find_one({class_id: id})
+    if document is None:
+        raise ItemNotFoundException
+    else:
+        #todo check if inplace append works
+        attendence = document[student_id].append(attended)
+        #document[student_id]=attendence
+        collection.update_one({class_id: id}, {"$set": document}, upsert=False)
+    return document
+
+def generate_id():
+    pass

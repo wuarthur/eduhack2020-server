@@ -57,18 +57,9 @@ def add_teacher():
         raise MissingBody
     return jsonify({"success": True, "status": 200}, 200)
 
-@app.route('/teacher', methods=['GET'])
-@exception_handler
-def search_teacher():
-    request_body = request.form.to_dict()
-    teachers = mongo_database.get_teachers(**request_body)
-    response = {'results': teachers}
-    print(response)
-    return jsonify(response, 200)
-
 @app.route('/class', methods=['POST'])
 @exception_handler
-def create_class():
+def add_class():
     try:
         request_body = request.form.to_dict()
         id = request_body.pop('class-id')
@@ -82,6 +73,25 @@ def create_class():
     except KeyError:
         raise MissingBody
     return jsonify({"success": True, "status": 200}, 200)
+
+@app.route('/teacher', methods=['GET'])
+@exception_handler
+def search_teacher():
+    request_body = request.form.to_dict()
+    teachers = mongo_database.get_teachers(**request_body)
+    response = {'results': teachers}
+    print(response)
+    return jsonify(response, 200)
+
+@app.route('/student', methods=['GET'])
+@exception_handler
+def search_student():
+    request_body = request.form.to_dict()
+    teachers = mongo_database.get_student(**request_body)
+    response = {'results': teachers}
+    print(response)
+    return jsonify(response, 200)
+
 
 @app.route('/class/<id>', methods=['POST'])
 @exception_handler
