@@ -114,6 +114,21 @@ def update_teacher(id):
     updated_doc = mongo_database.update_class(id, **request_body)
     return jsonify({"success": True, "updated_doc": updated_doc}, 200)
 
+@app.route('/attendance', methods=['POST'])
+@exception_handler
+def take_attendance():
+    try:
+        request_body = request.form.to_dict()
+        class_id = request_body.pop('class-id')
+        student_id = request_body.pop('student-id')
+        attended = request_body.pop('attended')
+        doc = mongo_database.take_attendence(class_id, student_id, attended)
+    except ValueError:
+        raise MissingBody
+    except KeyError:
+        raise MissingBody
+    return jsonify({"success": True, "status": 200, 'doc':doc}, 200)
+
 
 if __name__ == '__main__':
      app.run(host='127.0.0.1',port='1911', debug=True)

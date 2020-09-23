@@ -94,6 +94,9 @@ def add_teacher(id, name, courses, **kwargs):
     db[collection_name].insert_one(doc)
     db[collection_name].create_index('name')  # sort by name
 
+def generate_id():
+    collection_name = 'Teachers'
+
 def update_teacher(id, **kwargs):
     return update('Teachers', 'teacher-id', **kwargs)
 
@@ -116,5 +119,3 @@ def take_attendence(class_id, student_id, attended):
         collection.update_one({class_id: id}, {"$set": document}, upsert=False)
     return document
 
-def generate_id():
-    pass
