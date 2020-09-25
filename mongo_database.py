@@ -59,6 +59,17 @@ def get_student(**kwargs):
     #     teachers.append(posts)
     return students
 
+def get_class(class_id):
+    #attended = 0,1
+    collection = db['Courses']
+    print(class_id)
+    document = collection.find_one({"class-id": class_id})
+    if document is None:
+        raise ItemNotFoundException
+    else:
+        del document['_id']
+        return document
+
 def add_student(id, name, courses, **kwargs):
     doc={'student-id': id,
          'name': name,

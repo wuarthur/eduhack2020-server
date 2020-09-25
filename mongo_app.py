@@ -93,6 +93,15 @@ def search_student():
     print(response)
     return jsonify(response, 200)
 
+@app.route('/class/<id>', methods=['GET'])
+@exception_handler
+def search_class(id):
+    #request_body = request.form.to_dict()
+    class_info = mongo_database.get_class(id)
+    response = {'results': class_info}
+    print(response)
+    return jsonify(response, 200)
+
 
 @app.route('/class/<id>', methods=['POST'])
 @exception_handler
