@@ -26,6 +26,8 @@ def update(collection, id_str, **kwargs):
     return document
 
 def get_teachers(**kwargs):
+    if len(kwargs) ==0:
+        return []
     collection = db['Teachers']
     query = []
     for key, val in kwargs.items():
@@ -41,6 +43,8 @@ def get_teachers(**kwargs):
     return teachers
 
 def get_student(**kwargs):
+    if len(kwargs) ==0:
+        return []
     collection = db['Students']
     query = []
     for key, val in kwargs.items():
