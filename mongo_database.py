@@ -25,9 +25,18 @@ def update(collection, id_str, **kwargs):
         collection.update_one({id_str: id}, {"$set": document}, upsert=False)
     return document
 
+def get_all(collection):
+    collection = db[collection]
+    cursor = collection.find({})
+    all=[]
+    for post in cursor:
+        del post['_id']
+        all.append(post)
+    return all
+
 def get_teachers(**kwargs):
     if len(kwargs) ==0:
-        return []
+        return get_all('Teachers')
     collection = db['Teachers']
     query = []
     for key, val in kwargs.items():
@@ -44,7 +53,7 @@ def get_teachers(**kwargs):
 
 def get_student(**kwargs):
     if len(kwargs) ==0:
-        return []
+        return get_all('Students')
     collection = db['Students']
     query = []
     for key, val in kwargs.items():
@@ -58,6 +67,23 @@ def get_student(**kwargs):
     # for posts in collection.find({'height': '190cm'}):
     #     teachers.append(posts)
     return students
+
+def get_classes(**kwargs):
+    if len(kwargs) ==0:
+        return get_all('Courses')
+    collection = db['Courses']
+    query = []
+    for key, val in kwargs.items():
+        query.append({key:val})
+
+    course=[]
+    print({"$and": query})
+    for post in collection.find({"$and": query}):
+        del post['_id']
+        course.append(post)
+    # for posts in collection.find({'height': '190cm'}):
+    #     teachers.append(posts)
+    return course
 
 def get_class(class_id):
     #attended = 0,1

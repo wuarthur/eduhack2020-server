@@ -23,9 +23,7 @@ TYPES = {'total':'names',
 @exception_handler
 def index():
     return ('HEY!, please try calling again with one of the following path \n'
-            '/teacher POST \n'
-            '/student POST \n'
-            '/class POST \n')
+)
 
 
 @app.route('/student', methods=['POST'])
@@ -88,14 +86,23 @@ def search_teacher():
 @exception_handler
 def search_student():
     request_body = request.form.to_dict()
-    teachers = mongo_database.get_student(**request_body)
-    response = {'results': teachers}
+    student = mongo_database.get_student(**request_body)
+    response = {'results': student}
+    print(response)
+    return jsonify(response, 200)
+
+@app.route('/class', methods=['GET'])
+@exception_handler
+def search_class():
+    request_body = request.form.to_dict()
+    classes = mongo_database.get_classes(**request_body)
+    response = {'results': classes}
     print(response)
     return jsonify(response, 200)
 
 @app.route('/class/<id>', methods=['GET'])
 @exception_handler
-def search_class(id):
+def get_class(id):
     #request_body = request.form.to_dict()
     class_info = mongo_database.get_class(id)
     response = {'results': class_info}
