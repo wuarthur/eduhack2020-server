@@ -5,6 +5,7 @@ import sys
 from flask import Flask, jsonify, request
 import ssl
 from decorators import  *
+from exceptions import *
 
 
 app = Flask(__name__)
