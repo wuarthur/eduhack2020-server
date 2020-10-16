@@ -18,6 +18,8 @@ BOOL_SWITCH={'true':True,
 TYPES = {'total':'names',
          'crack-detected':'crack-detected'}
 
+id=0
+
 
 @app.route('/')
 @exception_handler
@@ -145,6 +147,14 @@ def take_attendance():
     except KeyError:
         raise MissingBody
     return jsonify({"success": True, "status": 200, 'doc':doc}, 200)
+
+@app.route('/id', methods=['GET'])
+@exception_handler
+def get_id():
+    global id
+    response = {'id': id}
+    id +=1
+    return jsonify(response, 200)
 
 
 if __name__ == '__main__':
