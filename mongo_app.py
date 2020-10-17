@@ -70,9 +70,9 @@ def add_class():
         id = request_body.pop('class-id')
         name = request_body.pop('course-name')
         courses = request_body.pop('year-offered')
-        students = request.form.getlist('student-id')
-        if 'student-id' in request_body:
-            request_body.pop('student-id')
+        students = request.form.getlist('students')
+        if 'students' in request_body:
+            request_body.pop('students')
         number_lecture = request_body.pop('number-of-lectures')
         mongo_database.add_class(id, name, courses, students, number_lecture, **request_body)
     except ValueError:
