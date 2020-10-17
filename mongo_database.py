@@ -11,11 +11,14 @@ mongo_client = MongoClient('mongodb://localhost:27017/',
                            # username = 'admin',
                            password = 'password')
 #mongo_client.server_info()
+print('clearing db...')
+mongo_client.drop_database('test')
 db = mongo_client['test']
 print('connection to Mongodb made')
 
-def update(collection, id_str, **kwargs):
+def update(collection, id_str, id,  **kwargs):
     collection = db[collection]
+    print({id_str: id})
     document = collection.find_one({id_str: id})
     if document is None:
         raise ItemNotFoundException
@@ -106,10 +109,14 @@ def add_student(id, name, courses, **kwargs):
     collection_name = 'Students'
     db[collection_name].insert_one(doc)
     db[collection_name].create_index('name') #sort by name
-
+    for class_id in courses:
+        doc = get_class(class_id)
+        # doc[id]=[]
+        students = doc['students']
+        students.append(id)
+        update_class(class_id, students= students)
 
 def add_class(id, name, year, students, lectures_count, **kwargs):
-    #todo check for duplicate
     doc = {'class-id': id,
             'course-name': name,
             'year-offered': year,
@@ -139,24 +146,31 @@ def generate_id():
     collection_name = 'Teachers'
 
 def update_teacher(id, **kwargs):
-    return update('Teachers', 'teacher-id', **kwargs)
+    return update('Teachers', 'teacher-id',id, **kwargs)
 
 def update_student(id, **kwargs):
-    return update('Students', 'student-id', **kwargs)
+    return update('Students', 'student-id',id, **kwargs)
 
 def update_class(id, **kwargs):
-    return update('Courses', 'class-id', **kwargs)
+    return update('Courses', 'class-id', id, **kwargs)
 
 def take_attendence(class_id, student_id, attended):
     #attended = 0,1
     collection = db['Courses']
-    document = collection.find_one({class_id: id})
+    document = collection.find_one({'class-id': class_id})
     if document is None:
         raise ItemNotFoundException
     else:
         #todo check if inplace append works
-        attendence = document[student_id].append(attended)
-        #document[student_id]=attendence
-        collection.update_one({class_id: id}, {"$set": document}, upsert=False)
+        if student_id not in document:
+            document[student_id]=[attended]
+        else:
+            attendence = document[student_id].append(attended)
+            document[student_id]=attendence
+        collection.update_one({'class-id': class_id}, {"$set": document}, upsert=False)
+        print('ok', document)
+    del document['_id']
     return document
+
+
 

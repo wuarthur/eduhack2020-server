@@ -35,7 +35,9 @@ def add_student():
         request_body = request.form.to_dict()
         id = request_body.pop('student-id')
         name = request_body.pop('name')
-        courses = request_body.pop('courses')
+        courses = request.form.getlist('courses')
+        if 'courses' in request_body:
+            request_body.pop('courses')
         mongo_database.add_student(id, name, courses, **request_body)
     except ValueError:
         raise MissingBody
@@ -50,7 +52,9 @@ def add_teacher():
         request_body = request.form.to_dict()
         id = request_body.pop('teacher-id')
         name = request_body.pop('name')
-        courses = request_body.pop('courses')
+        courses = request.form.getlist('courses')
+        if 'courses' in request_body:
+            request_body.pop('courses')
         mongo_database.add_teacher(id, name, courses, **request_body)
     except ValueError:
         raise MissingBody
@@ -66,12 +70,15 @@ def add_class():
         id = request_body.pop('class-id')
         name = request_body.pop('course-name')
         courses = request_body.pop('year-offered')
-        students = request_body.pop('students')
+        students = request.form.getlist('student-id')
+        if 'student-id' in request_body:
+            request_body.pop('student-id')
         number_lecture = request_body.pop('number-of-lectures')
         mongo_database.add_class(id, name, courses, students, number_lecture, **request_body)
     except ValueError:
         raise MissingBody
     except KeyError:
+        print(request.form.to_dict())
         raise MissingBody
     return jsonify({"success": True, "status": 200}, 200)
 
